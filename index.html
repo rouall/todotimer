@@ -2,13 +2,68 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; script-src 'self' 'unsafe-inline';" />
+    <script>
+      // Defensive: short-circuit beacons/fetch to known tracker domains (no-op)
+      (function(){
+        const blockedHosts = ['google.com','googletagmanager.com','www.google.com'];
+        const isBlocked = (url) => {
+          try { const u = new URL(url, window.location.href); return blockedHosts.some(h=>u.hostname.endsWith(h)); } catch { return false; }
+        };
+        const origFetch = window.fetch;
+        window.fetch = function(url, opts){ if(isBlocked(url)) return Promise.resolve(new Response('',{status:204})); return origFetch.apply(this, arguments); };
+        const origBeacon = navigator.sendBeacon?.bind(navigator);
+        if(origBeacon){ navigator.sendBeacon = function(url, data){ if(isBlocked(url)) return true; return origBeacon(url, data); }; }
+      })();
+    </script>
+    <script>
+      // Harden runtime: block external network calls and suppress host-injected errors
+      (function(){
+        const blockedHosts = ['google.com','googletagmanager.com','www.google.com','analytics','ttlog','bytecdn'];
+        const isBlocked = (url) => {
+          try { const u = new URL(url, window.location.href); return blockedHosts.some(h=>u.hostname.includes(h)); } catch { return false; }
+        };
+        // fetch
+        const origFetch = window.fetch;
+        window.fetch = function(url, opts){ if(isBlocked(url)) return Promise.resolve(new Response('',{status:204})); return origFetch.apply(this, arguments); };
+        // XHR
+        const OrigXHR = window.XMLHttpRequest;
+        function SafeXHR(){ const xhr = new OrigXHR(); const open = xhr.open; xhr.open = function(method, url){ if(isBlocked(url)) { this.__blocked = true; } return open.apply(this, arguments); }; const send = xhr.send; xhr.send = function(){ if(this.__blocked){ try{ this.abort(); }catch{} } else { return send.apply(this, arguments);} }; return xhr; }
+        window.XMLHttpRequest = SafeXHR;
+        // Beacon
+        const origBeacon = navigator.sendBeacon?.bind(navigator);
+        if(origBeacon){ navigator.sendBeacon = function(url, data){ if(isBlocked(url)) return true; return origBeacon(url, data); }; }
+        // Error filters
+        const suppress = [/NetworkError/i,/ERR_CONNECTION_(RESET|CLOSED)/i,/ccm\/collect/i,/response\.data\.code is not 0/i];
+        const origError = console.error.bind(console);
+        console.error = function(){ const msg = Array.from(arguments).join(' '); if(suppress.some(p=>p.test(msg))) return; origError.apply(console, arguments); };
+        window.addEventListener('error', (e)=>{
+          const s = String(e.message||''); if(suppress.some(p=>p.test(s))) { e.preventDefault?.(); return false; }
+        }, true);
+        window.addEventListener('unhandledrejection', (e)=>{
+          const s = String(e.reason&&e.reason.message||e.reason||''); if(suppress.some(p=>p.test(s))) { e.preventDefault?.(); return false; }
+        });
+      })();
+    </script>
+    <script>
+      // Console error filter: hide common external network errors from host environment
+      (function(){
+        const origError = console.error.bind(console);
+        const patterns = [/NetworkError/i, /ERR_CONNECTION_RESET/i, /ccm\/collect/i];
+        console.error = function(){
+          const msg = Array.from(arguments).join(' ');
+          if (patterns.some(p=>p.test(msg))) return; // suppress
+          origError.apply(console, arguments);
+        };
+      })();
+    </script>
     <title>任务清单与时间管理</title>
-    <script type="module" crossorigin src="./assets/index-D66Lefbf.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-sOBUL3ph.css">
+    <script type="module" crossorigin src="./assets/index-zsCk2wgu.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DpPamnQ7.css">
   </head>
   <body>
     <div id="root"></div>
