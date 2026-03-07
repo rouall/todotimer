@@ -6,8 +6,29 @@
     <link rel="alternate icon" href="./favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https://images.unsplash.com; media-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; script-src 'self' 'unsafe-inline' https://hm.baidu.com; worker-src 'self' blob:;" />
+        
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PD6WJXM887"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-    <script>
+  gtag('config', 'G-PD6WJXM887');
+</script>
+
+    <!-- 百度统计 -->
+        <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5a71513e13e7c8ecb5dab01a72a63f86";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<script>
       // Defensive: short-circuit beacons/fetch to known tracker domains (no-op)
       (function(){
         const blockedHosts = ['google.com','googletagmanager.com','www.google.com'];
