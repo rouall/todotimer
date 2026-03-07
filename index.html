@@ -28,19 +28,7 @@ var _hmt = _hmt || [];
 })();
 </script>
 
-<script>
-      // Defensive: short-circuit beacons/fetch to known tracker domains (no-op)
-      (function(){
-        const blockedHosts = ['google.com','googletagmanager.com','www.google.com'];
-        const isBlocked = (url) => {
-          try { const u = new URL(url, window.location.href); return blockedHosts.some(h=>u.hostname.endsWith(h)); } catch { return false; }
-        };
-        const origFetch = window.fetch;
-        window.fetch = function(url, opts){ if(isBlocked(url)) return Promise.resolve(new Response('',{status:204})); return origFetch.apply(this, arguments); };
-        const origBeacon = navigator.sendBeacon?.bind(navigator);
-        if(origBeacon){ navigator.sendBeacon = function(url, data){ if(isBlocked(url)) return true; return origBeacon(url, data); }; }
-      })();
-    </script>
+
 
     <script>
 var _hmt = _hmt || [];
@@ -56,7 +44,7 @@ var _hmt = _hmt || [];
     <script>
       // Harden runtime: block external network calls and suppress host-injected errors
       (function(){
-        const blockedHosts = ['google.com','googletagmanager.com','www.google.com','analytics','ttlog','bytecdn'];
+        const blockedHosts = ['ttlog','bytecdn'];
         const isBlocked = (url) => {
           try { const u = new URL(url, window.location.href); return blockedHosts.some(h=>u.hostname.includes(h)); } catch { return false; }
         };
